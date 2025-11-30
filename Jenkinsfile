@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        // Optional: if you configured a named Python installation in Jenkins, reference it here
+        PYTHON_EXE = 'python' // points to your Windows Python with pip
+    }
+
     stages {
 
         stage('Checkout Code') {
@@ -11,28 +16,28 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                bat '''
-                python -m venv venv
-                python -m pip install --upgrade pip
-                venv\\Scripts\\python -m pip install -r requirements.txt
-                '''
+                bat """
+                %PYTHON_EXE% -m venv venv
+                venv\\Scripts\\python.exe -m pip install --upgrade pip
+                venv\\Scripts\\python.exe -m pip install -r requirements.txt
+                """
             }
         }
 
         stage('Lint & Static Analysis') {
             steps {
-                bat '''
-                venv\\Scripts\\python -m pylint app --exit-zero
+                bat """
+                venv\\Scripts\\python.exe -m pylint app --exit-zero
                 venv\\Scripts\\bandit -r app
-                '''
+                """
             }
         }
 
         stage('Unit Tests') {
             steps {
-                bat '''
-                venv\\Scripts\\python -m pytest --cov=app --cov-report=xml
-                '''
+                bat """
+                venv\\Scripts\\python.exe -m pytest --cov=app --cov-report=xml
+                """
             }
         }
 
@@ -54,7 +59,7 @@ pipeline {
 
         stage('Package Application') {
             steps {
-                // Using PowerShell Compress-Archive for Windows
+                // Use PowerShell Compress-Archive for Windows
                 bat 'powershell Compress-Archive -Path app\\* -DestinationPath artifact.zip'
             }
         }
