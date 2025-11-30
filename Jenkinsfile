@@ -11,9 +11,9 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh '''
-                python3 -m venv venv
-                . venv/bin/activate
+                bat '''
+                python -m venv venv
+                venv\\Scripts\\activate
                 pip install -r requirements.txt
                 '''
             }
@@ -21,8 +21,8 @@ pipeline {
 
         stage('Lint & Static Analysis') {
             steps {
-                sh '''
-                . venv/bin/activate
+                bat '''
+                venv\\Scripts\\activate
                 pylint app --exit-zero
                 bandit -r app
                 '''
@@ -31,8 +31,8 @@ pipeline {
 
         stage('Unit Tests') {
             steps {
-                sh '''
-                . venv/bin/activate
+                bat '''
+                venv\\Scripts\\activate
                 pytest --cov=app --cov-report=xml
                 '''
             }
@@ -41,7 +41,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('MySonarQubeServer') {
-                    sh 'sonar-scanner'
+                    bat 'sonar-scanner'
                 }
             }
         }
@@ -56,7 +56,7 @@ pipeline {
 
         stage('Package Application') {
             steps {
-                sh 'zip -r artifact.zip app/'
+                bat 'powershell Compress-Archive -Path app\\* -DestinationPath artifact.zip'
             }
         }
     }
