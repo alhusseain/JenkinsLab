@@ -23,3 +23,12 @@ class Config:
     ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')
     REDIS_URL = os.environ.get('REDIS_URL') or 'redis://'
     POSTS_PER_PAGE = 25
+
+class TestingConfig(Config):
+ TESTING = True
+ SQLALCHEMY_DATABASE_URI = "sqlite://"
+ WTF_CSRF_ENABLED = False
+
+ ELASTICSEARCH_URL = None
+ REDIS_URL = "redis://"
+ LOG_TO_STDOUT = False

@@ -9,9 +9,11 @@ from app.auth.forms import LoginForm, RegistrationForm, \
     ResetPasswordRequestForm, ResetPasswordForm
 from app.models import User
 from app.auth.email import send_password_reset_email
+from memory_profiler import profile
 
 
 @bp.route('/login', methods=['GET', 'POST'])
+@profile
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
