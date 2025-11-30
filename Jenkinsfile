@@ -13,8 +13,8 @@ pipeline {
             steps {
                 bat '''
                 python -m venv venv
-                venv\\Scripts\\activate
-                pip install -r requirements.txt
+                python -m pip install --upgrade pip
+                venv\\Scripts\\python -m pip install -r requirements.txt
                 '''
             }
         }
@@ -22,9 +22,8 @@ pipeline {
         stage('Lint & Static Analysis') {
             steps {
                 bat '''
-                venv\\Scripts\\activate
-                pylint app --exit-zero
-                bandit -r app
+                venv\\Scripts\\python -m pylint app --exit-zero
+                venv\\Scripts\\bandit -r app
                 '''
             }
         }
@@ -32,8 +31,7 @@ pipeline {
         stage('Unit Tests') {
             steps {
                 bat '''
-                venv\\Scripts\\activate
-                pytest --cov=app --cov-report=xml
+                venv\\Scripts\\python -m pytest --cov=app --cov-report=xml
                 '''
             }
         }
@@ -56,6 +54,7 @@ pipeline {
 
         stage('Package Application') {
             steps {
+                // Using PowerShell Compress-Archive for Windows
                 bat 'powershell Compress-Archive -Path app\\* -DestinationPath artifact.zip'
             }
         }
