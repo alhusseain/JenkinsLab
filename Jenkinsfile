@@ -1,23 +1,27 @@
 pipeline {
     agent any
 
-    environment {
-        // Optional: if you configured a named Python installation in Jenkins, reference it here
-        PYTHON_EXE = 'python' // points to your Windows Python with pip
-    }
-
     stages {
-
         stage('Checkout Code') {
             steps {
                 git branch: 'main', url: 'https://github.com/alhusseain/JenkinsLab.git'
             }
         }
 
+        stage('Check Python') {
+            steps {
+                bat """
+                where python
+                python --version
+                python -m pip --version
+                """
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
                 bat """
-                %PYTHON_EXE% -m venv venv
+                python -m venv venv
                 venv\\Scripts\\python.exe -m pip install --upgrade pip
                 venv\\Scripts\\python.exe -m pip install -r requirements.txt
                 """
@@ -59,7 +63,6 @@ pipeline {
 
         stage('Package Application') {
             steps {
-                // Use PowerShell Compress-Archive for Windows
                 bat 'powershell Compress-Archive -Path app\\* -DestinationPath artifact.zip'
             }
         }
